@@ -4,6 +4,13 @@ const {generateToken} = require('../middleware/auth')
 const signupControl = async (req, res) => {
     try{
         const data = req.body
+        if (data.role === 'admin') {
+            const adminExists = await User.findOne({ role: 'admin' });
+
+            if (adminExists) {
+                return res.status(400).json({ error: 'An admin account already exists. Only one admin is allowed.' });
+            }
+        }
         const newUser = new User(data)
 
         const responce = await newUser.save()
@@ -12,7 +19,8 @@ const signupControl = async (req, res) => {
         const payload = {
             id: responce.id,
             username: responce.username,
-            password: responce.password
+            password: responce.password,
+            role: responce.role,
         }
 
         const token = generateToken(payload);

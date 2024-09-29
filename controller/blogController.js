@@ -15,8 +15,22 @@ const createBlog = async (req, res) => {
 
 const getBlogs = async (req, res) => {
     try{
-        const data = await Blog.find({user: req.user.id})
-        res.status(200).json({responce: data})
+        const userId = req.user.id; 
+        const userRole = req.user.role; 
+
+        console.log(userId);
+        console.log(userRole)
+
+
+        let data;
+
+        if (userRole === 'admin') {
+            data = await Blog.find();
+        } else {
+            data = await Blog.find({ userId: userId });
+        }
+    
+        res.status(200).json({response: data})
     }catch(err){
         console.log(err);
         res.status(500).json({error: 'internal server error'});
